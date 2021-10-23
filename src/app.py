@@ -37,7 +37,7 @@ def lambda_handler(event, context):
 def post_handler(event, context):
     payload = json.loads(event['body'])
     digest = _hashme(payload['document'])
-
+    logger.log(2, f"The digest is {digest}")
     payload['hash'] = digest
 
     try:
