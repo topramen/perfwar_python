@@ -10,7 +10,7 @@ from aws_lambda_powertools import Logger, Tracer, Metrics
 
 logger = Logger()
 tracer = Tracer()
-metrics = Metrics()
+metrics = Metrics(namespace="PerfWar", service="PythonTest")
 
 table_name = getenv('Table')
 resource = boto3.resource('dynamodb')
@@ -23,13 +23,15 @@ table = resource.Table(table_name)
 def lambda_handler(event, context):
 
     if event['httpMethod'] == 'POST':
+        logger.info("Inside POST Handler")
         return post_handler(event, context)
     else:
+        logger.info("Inside GET Handler")
         return get_handler(event, context)
 
     return {
         "statusCode": 200,
-        "body": json.dumps({
+        "body": json.stringify({
             "message": "not much has happened"
         }),
     }
@@ -37,7 +39,7 @@ def lambda_handler(event, context):
 def post_handler(event, context):
     payload = json.loads(event['body'])
     digest = _hashme(payload['document'])
-    logger.log(2, f"The digest is {digest}")
+    logger.info(f"The digest is {digest}")
     payload['hash'] = digest
 
     try:

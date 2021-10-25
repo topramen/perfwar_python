@@ -1,5 +1,5 @@
 deploy:
-	sam build
+	sam build --use-container
 
 	sam package --s3-bucket ${DOL_BNK_BUCKET} \
 		--output-template-file packaged-template.yaml  \
