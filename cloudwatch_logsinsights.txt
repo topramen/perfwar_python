@@ -1,5 +1,12 @@
 fields @timestamp, @message
-| stats count() by bin(1h)
+| stats count() by bin(1m)
+| filter cold_start=1
+| sort @timestamp desc
+| limit 20
+
+
+
+fields @timestamp, @message
 | filter cold_start=1
 | sort @timestamp desc
 | limit 20
