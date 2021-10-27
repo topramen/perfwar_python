@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   python_test
 
-  Testing the performance of python3.8 lambda
+  Testing the performance of python3.9 lambda
 
 Globals:
   Function:
@@ -18,7 +18,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.9
       MemorySize: 256
       ReservedConcurrentExecutions: 10
       Policies:

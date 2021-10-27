@@ -2,11 +2,9 @@ import json
 import boto3
 import botocore
 import hashlib
-from uuid import uuid4
-import json
 from os import getenv
 from aws_lambda_powertools import Logger, Tracer, Metrics
-
+from boto3.dynamodb.conditions import Key
 
 logger = Logger()
 tracer = Tracer()
@@ -28,10 +26,9 @@ def lambda_handler(event, context):
     else:
         logger.info("Inside GET Handler")
         return get_handler(event, context)
-
     return {
         "statusCode": 200,
-        "body": json.stringify({
+        "body": json.dumps({
             "message": "not much has happened"
         }),
     }
@@ -52,8 +49,6 @@ def post_handler(event, context):
                 "message": "object already exists"
             }),
         }
-
-
     return {
         "statusCode": 201,
         "body": json.dumps({
@@ -64,12 +59,28 @@ def post_handler(event, context):
 
 def get_handler(event, context):
     id = event['queryStringParameters']['id']
-    item = table.get_item(Key={'ID': id})
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps(item['Item']),
-    }
+    # add a try/catch block here
+    # try:
+    # item = table.get_item(Key={'ID': id})
+    # except botocore.exceptions.ResourceNotFoundException as e:
+    response = table.query(
+        KeyConditionExpression=Key('ID').eq(id)
+    )
+    items = response.get("Items", None)
+    logger.info(f"The items are {items}")
+    if items:    
+        return {
+            "statusCode": 200,
+            "body": json.dumps(items[0]),
+        }
+    else:
+                return {
+            "statusCode": 404,
+            "body": json.dumps({
+                "id": id,
+                "message": "object not found"
+            }),
+        }
 
 def _hashme(document):
     sha = hashlib.sha256()
